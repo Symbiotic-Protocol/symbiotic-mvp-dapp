@@ -1,29 +1,13 @@
-// deploy/00_deploy_my_contract.js
+const addresses = require("../addresses.json");
 
-// const { ethers } = require("hardhat");
-
-// const sleep = (ms) =>
-//   new Promise((r) =>
-//     setTimeout(() => {
-//       console.log(`waited for ${(ms / 1000).toFixed(3)} seconds`);
-//       r();
-//     }, ms)
-//   );
-
-module.exports = async ({ getNamedAccounts, deployments }) => {
+module.exports = async ({ getNamedAccounts, deployments, network }) => {
+  console.log(deployments, network)
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy("Greeter", {
+  await deploy("SymbioticProtocol", {
     from: deployer,
-    args: ["hello world"],
-    log: true,
-  });
-
-  await deploy("Storage", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    args: [addresses.alfajoresCeloDollarAddress],
     log: true,
   });
 
@@ -59,4 +43,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
 };
 
-module.exports.tags = ["Greeter", "Storage"];
+module.exports.tags = ["SymbioticProtocol"];
