@@ -13,15 +13,22 @@ contract NonProfitsHandler is Ownable {
     event NonProfitsSet(NonProfit[] nonProfits);
     event NonProfitsAdded(NonProfit[] nonProfits);
 
-    NonProfit[] public nonProfits;
+    NonProfit[] internal nonProfits;
     IERC20 public cUSD;
 
     constructor(address _cUsdAddress) {
         cUSD = IERC20(_cUsdAddress);
     }
 
+    function getNonProfits() view external returns (NonProfit[] memory) {
+        return nonProfits;
+    }
+
     function setNonProfits(NonProfit[] calldata newNonProfits) external onlyOwner {
-        nonProfits = newNonProfits;
+        delete nonProfits;
+        for (uint i = 0; i < newNonProfits.length; i++) {
+            nonProfits.push(newNonProfits[i]);
+        }
         emit NonProfitsSet(nonProfits);
     }
 

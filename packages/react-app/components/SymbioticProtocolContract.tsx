@@ -6,11 +6,11 @@ import { useContractKit } from "@celo-tools/use-contractkit";
 import { useEffect, useState } from "react";
 import { SnackbarAction, SnackbarKey, useSnackbar } from "notistack";
 import { truncateAddress } from "@/utils";
-import { Greeter } from "@celo-progressive-dapp-starter/hardhat/types/Greeter";
+import { SymbioticProtocol } from "@celo-progressive-dapp-starter/hardhat/types/SymbioticProtocol";
 
-export function GreeterContract({ contractData }) {
+export function SymbioticProtocolContract({ contractData }) {
   const { kit, address, network, performActions } = useContractKit();
-  const [greeterValue, setGreeterValue] = useState<string | null>(null);
+  const [nonProfits, setNonProfits] = useState<string[]>([]);
   const [greeterInput, setGreeterInput] = useInput({ type: "text" });
   const [contractLink, setContractLink] = useState<string>("");
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -19,7 +19,7 @@ export function GreeterContract({ contractData }) {
     ? (new kit.web3.eth.Contract(
         contractData.abi,
         contractData.address
-      ) as any as Greeter)
+      ) as any as SymbioticProtocol)
     : null;
 
   useEffect(() => {
@@ -28,15 +28,18 @@ export function GreeterContract({ contractData }) {
     }
   }, [network, contractData]);
 
-  const setGreeter = async () => {
+  const donate = async () => {
+    // TODO: these values should be set by frontend selectors 
+    const roleId = 0;
+    const value = 100; 
     try {
       await performActions(async (kit) => {
         const gasLimit = await contract.methods
-          .setGreeting(greeterInput as string)
+          .donate(roleId, value)
           .estimateGas();
 
         const result = await contract.methods
-          .setGreeting(greeterInput as string)
+          .donate(roleId, value)
           //@ts-ignore
           .send({ from: address, gasLimit });
 
@@ -69,10 +72,10 @@ export function GreeterContract({ contractData }) {
     }
   };
 
-  const getGreeter = async () => {
+  const getNonProfits = async () => {
     try {
-      const result = await contract.methods.greet().call();
-      setGreeterValue(result);
+      const result = await contract.methods.getNonProfits().call();
+      setNonProfits(result.map((nonProfit) => nonProfit[0]));
     } catch (e) {
       console.log(e);
     }
@@ -91,19 +94,12 @@ export function GreeterContract({ contractData }) {
         )}
         <Divider sx={{ m: 1 }} />
 
-        <Typography variant="h6">Write Contract</Typography>
-        <Box sx={{ m: 1, marginLeft: 0 }}>{setGreeterInput}</Box>
-        <Button sx={{ m: 1, marginLeft: 0 }} variant="contained" onClick={setGreeter}>
-          Update Greeter Contract
-        </Button>
-        <Divider sx={{ m: 1 }} />
-
         <Typography variant="h6">Read Contract</Typography>
         <Typography sx={{ m: 1, marginLeft: 0, wordWrap: "break-word" }}>
-          Greeter Contract Value: {greeterValue}
+          Non Profits: {nonProfits}
         </Typography>
-        <Button sx={{ m: 1, marginLeft: 0 }} variant="contained" onClick={getGreeter}>
-          Read Greeter Contract
+        <Button sx={{ m: 1, marginLeft: 0 }} variant="contained" onClick={donate}>
+          Donate
         </Button>
       </Grid>
     </Grid>
